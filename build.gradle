@@ -1,0 +1,50 @@
+/*apply plugin: 'application'
+mainClassName = 'sg.docker.HelloWorld'*/
+
+plugins {
+    id 'org.springframework.boot' version '2.2.5.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+    id 'maven-publish'
+}
+
+// The repositories block indicates that the build should resolve its dependencies from the
+// Maven Central repository. Gradle leans heavily on many conventions and facilities
+// established by the Maven build tool, including the option of using Maven Central as a
+// source of library dependencies.
+
+// tag::repositories[]
+repositories {
+    mavenCentral()
+}
+// end::repositories[]
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+// tag::dependencies[]
+dependencies {
+    //Required dependencies for compiling the project code, but that will be provided
+    // at runtime by a container running the code (for example, the Java Servlet API)
+    compile "joda-time:joda-time:2.2"
+    //Dependencies used for compiling and running tests, but not required for building
+    // or running the project’s runtime code.
+    testCompile "org.junit.jupiter:junit-jupiter-api:5.3.1"
+}
+// end::dependencies[]
+
+//Finally, let’s specify the name for our JAR artifact.
+// tag::jar[]
+jar {
+    baseName = 'dockerapp'
+    version =  '0.1.0'
+}
+// end::jar[]
+
+
+// tag::wrapper[]
+wrapper {
+    gradleVersion = '5.0'
+}
+
+// end::wrapper[]
