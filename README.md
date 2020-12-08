@@ -1,6 +1,5 @@
 # dockerapp
 
-SpringBoot version 2.4
-Gradle version 6.7.1
-Junit5
+The application presents a simple message at localhost:8080 and also at the various /actuator/health endpoints.
+
 
