@@ -1,0 +1,49 @@
+=  Integration Documentation
+:toc: left
+:toclevels: 3
+:sectanchors:
+:sectlinks:
+:source-indent: coderay
+:icons: font
+
+
+This is one in all and all in one project to integrate basic flow that is applied in all Java projects.
+It supports gradle upgrades, spin up servers using docker, documenting using ascii doc, performing unit test and integration test using Junit and SpringTest.
+To keep it simple, I am going to have 3 basic endpoints of capturing virtual payments using OAuth2.
+
+
+.Revision History
+[cols="3,1,1,1", options="header"]
+|===
+|change |Version |Date |By
+
+|Initial Documentation | 1 | 2020-10-21 | Susan Grey
+
+|===
+
+
+== Gradle
+
+
+.Libraries used
+[cols="3,1", options="header"]
+|===
+|Library |Version
+
+|SpringBoot | 2.4.0
+|Gradle | 6.7.1
+
+
+|===
+
+== Docker
+== Security
+=== OAuth2
+== Transaction
+=== createTransaction
+=== updateTransaction
+=== voidTransaction
+=== releaseTransaction
+== Testing
+=== Unit Test
+=== Integration Test
