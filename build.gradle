@@ -11,6 +11,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
     id 'java'
     id 'maven-publish'
+    id "com.palantir.docker" version "0.25.0"
 }
 
 group = 'sg'
@@ -19,6 +20,8 @@ if(!project.hasProperty('BUILD_NUMBER')){
 }else{
     version= "1.${BUILD_NUMBER}"
 }
+
+
 
 /**
  * This updates the Spring boot actuator indo endpoint with bersion and other user info
@@ -92,6 +95,12 @@ wrapper {
     gradleVersion = '6.7.1'
 }
 // end::wrapper[]
+
+docker {
+    name "${project.name}:${project.version}"
+    dockerfile file('docker/Dockerfile')
+    files 'docker/entrypoint.sh', "$buildDir/libs/"
+}
 
 
 publishing{
