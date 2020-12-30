@@ -32,13 +32,32 @@ To keep it simple, I am going to have 3 basic endpoints of capturing virtual pay
 
 |SpringBoot | 2.4.0
 |Gradle | 6.7.1
+|SpringSecurity | 5.4.2
+
 
 
 |===
 
 == Docker
+== Configuration
+=== Custom RestTemplate
+RestTemplate is a synchronous client to perform HTTP requests. It uses a simple, template method API over underlying HTTP client libraries such as the JDK HttpURLConnection, Apache HttpComponents, and others.
+
+Since Spring 5.0, a new client WebClient is available that can be use do create both synchronous and asynchronous requests. In the future releases, RestTemplate will be deprecated in favour of WebClient.
+--
+. OAuth 2.0 Client features of Spring Security 5.2.x do not support RestTemplate, but only WebClient.
+. See https://docs.spring.io/spring-security/site/docs/5.2.1.RELEASE/reference/htmlsingle/#oauth2client[Spring Security Reference]
+--
+
+NOTE:  As of 5.0, the non-blocking, reactive org.springframework.web.reactive.client.WebClient offers a modern alternative to the RestTemplate with efficient support for both sync and async, as well as streaming scenarios. The RestTemplate will be deprecated in a future version and will not have major new features added going forward. See the WebClient section of the Spring Framework reference documentation for more details and example code.
+
 == Security
 === OAuth2
+The Spring Security OAuth project is deprecated. The latest OAuth 2.0 support is provided by Spring Security.
+
+=== Spring Security
+Spring Security is a framework that provides authentication, authorization, and protection against common attacks.
+
 == Transaction
 === createTransaction
 === updateTransaction
