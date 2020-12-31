@@ -63,13 +63,17 @@ targetCompatibility = 11
 
 // tag::dependencies[]
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+ //   implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-hateoas'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.apache.commons:commons-lang3:3.9'
 
-    compile "org.springframework.boot:spring-boot-starter-security"
+
+   // compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+   /* compile group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.0.0.M3'*/
 
     implementation 'org.projectlombok:lombok:1.18.12'
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
@@ -81,8 +85,32 @@ dependencies {
     //Dependencies used for compiling and running tests, but not required for building
     // or running the project’s runtime code.
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.3.1"
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
 // end::dependencies[]
+
+
+// Multiple projects
+
+/*project("boot-auth-server") {
+    dependencies {
+        compile('org.springframework.boot:spring-boot-starter-security')
+        compile('org.springframework.boot:spring-boot-starter-freemarker')
+        compile('org.springframework.security.oauth:spring-security-oauth2')
+        compile('org.springframework.security:spring-security-jwt')
+
+    }
+}
+
+project("boot-microservice") {
+    dependencies {
+        compile('org.springframework.boot:spring-boot-starter-security')
+        compile('org.springframework.security.oauth:spring-security-oauth2')
+        compile('org.springframework.security:spring-security-jwt')
+    }
+}*/
+
+//End of multiple projects
 
 //Finally, let’s specify the name for our JAR artifact.
 // tag::jar[]

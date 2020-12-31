@@ -40,8 +40,29 @@ To keep it simple, I am going to have 3 basic endpoints of capturing virtual pay
 
 == Docker
 == Configuration
-=== Custom RestTemplate
-RestTemplate is a synchronous client to perform HTTP requests. It uses a simple, template method API over underlying HTTP client libraries such as the JDK HttpURLConnection, Apache HttpComponents, and others.
+=== RestTemplateConfig
+The <<RestTemplateConfig>> class configures the RestTemplate as spring bean. It adds the following custom feature -
+--
+ . Interceptor for logging purpose.
+ . Custom error handler if needed.
+ . HttpMessageConverter that can read and write JSON using Jackson 2.x's  ObjectMappe
+--
+
+.RestTemplateConfig
+[[RestTemplateConfig]]
+[source, java]
+----
+@Slf4j
+@Configuration
+public class RestTemplateConfig {
+
+    @Bean
+    public RestTemplate restTemplate(CustomResponseErrorHandler customResponseErrorHandler) {
+        ......
+    }
+----
+
+NOTE: Its uses a synchronous client to perform HTTP requests.
 
 Since Spring 5.0, a new client WebClient is available that can be use do create both synchronous and asynchronous requests. In the future releases, RestTemplate will be deprecated in favour of WebClient.
 --

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
@@ -23,7 +24,13 @@ public class RestTemplateConfig {
 
     @Bean
     public RestTemplate restTemplate(CustomResponseErrorHandler customResponseErrorHandler) {
-        //Create a new instance of the HttpComponentsClientHttpRequestFactory with a default HttpClient based on system properties.
+        /**
+         * Synchronous client to perform HTTP requests.
+         * Create a new instance of the RestTemplate using default settings.
+         *
+         * Note: Please consider using the org.springframework.web.reactive.client.WebClient
+         * which has a more modern API and supports sync, async, and streaming scenarios
+         */
         RestTemplate restTemplate = new RestTemplate();
         //add the custom response Handler
         restTemplate.setErrorHandler(customResponseErrorHandler);
@@ -56,4 +63,6 @@ public class RestTemplateConfig {
 
         return restTemplate;
     }
+
+
 }
