@@ -30,10 +30,10 @@ To keep it simple, I am going to have 3 basic endpoints of capturing virtual pay
 |===
 |Library |Version
 
-|SpringBoot | 2.4.0
+|SpringBoot | 2.5.4
 |JDK | 17
-|Gradle | 6.7.1
-|SpringSecurity | 5.4.2
+|Gradle | 7.2
+|SpringSecurity | ?
 
 
 

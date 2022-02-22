@@ -1,160 +1,147 @@
-import java.text.SimpleDateFormat
-
-static def buildTime(){
-    final dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ")
-    dateFormat.timeZone = TimeZone.getTimeZone('GMT')
-    dateFormat.format(new Date())
-}
-
 plugins {
     id 'org.springframework.boot' version '2.5.4'
-    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
     id "org.sonarqube" version "2.7"
     id 'jacoco'
     id 'pmd'
     id 'maven-publish'
-    //id "com.palantir.docker" version "0.25.0"
 }
 
-group = 'sg'
-if(!project.hasProperty('BUILD_NUMBER')){
-    version = "0.0.1-SNAPSHOT"
-}else{
-    version= "1.${BUILD_NUMBER}"
-}
+group = 'ad'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
 
-sourceCompatibility = 17
-targetCompatibility = 17
-
-
-/**
- * This updates the Spring boot actuator indo endpoint with bersion and other user info
- */
-springBoot {
-    buildInfo{
-        properties {
-            //Generate extra build info
-            additional = [
-                    name       : 'docker-app',
-                    description: 'This project is all about Spinning new services and keeping the SpringBoot/Gradle and other libraries uptodate',
-                    //Override buildInfo time
-                    time       :  buildTime()
-            ]
-        }
-    }
-}
-
-// The repositories block indicates that the build should resolve its dependencies from the
-// Maven Central repository. Gradle leans heavily on many conventions and facilities
-// established by the Maven build tool, including the option of using Maven Central as a
-// source of library dependencies.
-
-// tag::repositories[]
 repositories {
     mavenCentral()
 }
-// end::repositories[]
 
-configurations {
-    [apiElements, runtimeElements].each{
-        it.outgoing.artifacts.removeIf { it.buildDependencies.getDependencies(null).contains(jar)}
-        it.outgoing.artifact(bootJar)
-        }
-    }
-
-
-// tag::dependencies[]
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
- //   implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'org.apache.commons:commons-lang3:3.9'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'commons-io:commons-io:2.11.0'
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.flywaydb:flyway-core'
 
+    implementation 'com.sendgrid:sendgrid-java:4.7.2'
+    implementation 'org.freemarker:freemarker:2.3.31' //Sending email with freemarker template
 
-   // compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
-   /* compile group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.0.0.M3'*/
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
 
-    implementation 'org.projectlombok:lombok:1.18.12'
-    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.rest-assured:rest-assured'
+    testImplementation "org.testcontainers:testcontainers:1.16.0"
+    testImplementation "org.testcontainers:junit-jupiter:1.16.0"
+    testImplementation "org.testcontainers:postgresql:1.16.0"
+    testImplementation 'com.github.tomakehurst:wiremock-jre8:2.31.0'
+    testImplementation 'org.springframework:spring-context-support:5.1.0.RELEASE'
 
-
-    //Required dependencies for compiling the project code, but that will be provided
-    // at runtime by a container running the code (for example, the Java Servlet API)
-    implementation "joda-time:joda-time:2.2"
-    //Dependencies used for compiling and running tests, but not required for building
-    // or running the project’s runtime code.
-    testImplementation "org.junit.jupiter:junit-jupiter-api:5.3.1"
-    testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
-// end::dependencies[]
 
+pmd {
+    rulesMinimumPriority = 2
+}
 
-// Multiple projects
-
-/*project("boot-auth-server") {
-    dependencies {
-        compile('org.springframework.boot:spring-boot-starter-security')
-        compile('org.springframework.boot:spring-boot-starter-freemarker')
-        compile('org.springframework.security.oauth:spring-security-oauth2')
-        compile('org.springframework.security:spring-security-jwt')
-
+sonarqube {
+    properties {
+        property "sonar.exclusions", "**/model**"
     }
 }
 
-project("boot-microservice") {
-    dependencies {
-        compile('org.springframework.boot:spring-boot-starter-security')
-        compile('org.springframework.security.oauth:spring-security-oauth2')
-        compile('org.springframework.security:spring-security-jwt')
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.enabled true
     }
-}*/
 
-//End of multiple projects
-
-//Finally, let’s specify the name for our JAR artifact.
-// tag::jar[]
-/*jar {
-   enabled=true
-}*/
-// end::jar[]
-
-
-// tag::wrapper[]
-wrapper {
-    gradleVersion = '7.2'
-}
-// end::wrapper[]
-
-docker {
-    name "${project.name}:${project.version}"
-    dockerfile file('docker/Dockerfile')
-    files 'docker/entrypoint.sh', "$buildDir/libs/"
+    afterEvaluate {
+        classDirectories.from = files(classDirectories.files.collect {
+            fileTree(dir: it,
+                    exclude: ['**/model**'])
+        })
+    }
 }
 
+// Setup Integration Tests; borrowed from activities-partner-api
+sourceSets {
+    // So that we can place source code in 'src/integrationTest/java':
+    integrationTest {
+        java {
+            // So that we can compile against the business classes
+            compileClasspath += main.output
+            // So that we can compile against the libs used by the business classes
+            compileClasspath += main.compileClasspath
 
-publishing{
+            // So that we can compile against the unit test classes
+            compileClasspath += test.output
+            // So that we can compile against the libs used by the unit test classes
+            compileClasspath += test.compileClasspath
+
+            // So that test- and business classes can be used at runtime:
+            runtimeClasspath += test.runtimeClasspath
+        }
+    }
+}
+
+// Define the integrationTest task
+task integrationTest(type: Test) {
+    // Need to specify the use of JUnit platform in order to run Junit 5 tests
+    useJUnitPlatform()
+    // So that Gradle knows where the integration test classes are:
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+
+    // So that Gradle knows which runtime class path to use:
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    classpath += files('src/test/resources')
+
+    // Better report the test outcomes
+    // Borrowed from https://gist.github.com/orip/4951642
+    testLogging {
+        afterSuite { desc, result ->
+            if (!desc.parent) {
+                println "Integration Test Results: ${result.resultType} " +
+                        "(${result.testCount} tests," +
+                        "${result.successfulTestCount} successes," +
+                        "${result.failedTestCount} failures," +
+                        "${result.skippedTestCount} skipped)"
+            }
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        afterSuite { desc, result ->
+            if (!desc.parent) {
+                println "Test Results: ${result.resultType} " +
+                        "(${result.testCount} tests," +
+                        "${result.successfulTestCount} successes," +
+                        "${result.failedTestCount} failures," +
+                        "${result.skippedTestCount} skipped)"
+            }
+        }
+    }
+}
+
+
+publishing {
     publications {
         maven(MavenPublication) {
             groupId 'sg'
             artifactId 'docker-app'
             artifact jar
-            from components.java
-            versionMapping {
-                usage('java-api') {
-                    fromResolutionOf('runtimeClasspath')
-                }
-                usage('java-runtime') {
-                    fromResolutionResult()
-                }
-            }
         }
     }
-        repositories {
-            maven{
-                url "${buildDir}/repo"
-            }
+    repositories {
+        maven {
+            url "${buildDir}/repo"
         }
+    }
 }
