@@ -1,0 +1,13 @@
+services:
+  redis:
+    image: 'bitnami/redis:latest'
+    volumes:
+        - data:/path/to/redis-persistence/bitnami/redis/data
+      ports:
+        - '6379'
+    environment:
+      - REDIS_REPLICATION_MODE=master
+      - REDIS_PASSWORD=my_master_password
+  volumes:
+    data:
+      driver: local

@@ -31,6 +31,7 @@ To keep it simple, I am going to have 3 basic endpoints of capturing virtual pay
 |Library |Version
 
 |SpringBoot | 2.4.0
+|JDK | 17
 |Gradle | 6.7.1
 |SpringSecurity | 5.4.2
 
@@ -39,6 +40,14 @@ To keep it simple, I am going to have 3 basic endpoints of capturing virtual pay
 |===
 
 == Docker
+Redis - Redis is an open source key-value store that functions as a data structure
+
+.. in-memory database
+.. key-value data model
+.. NoSQL databases ( are meant to run efficiently in distributed clusters that scale out horizontally)
+
+Using Docker to deploy Redis in a container makes horizontal scaling a routine, straightforward process
+
 == Configuration
 === RestTemplateConfig
 The <<RestTemplateConfig>> class configures the RestTemplate as spring bean. It adds the following custom feature -
